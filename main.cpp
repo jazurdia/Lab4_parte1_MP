@@ -20,10 +20,10 @@ void *sumatoria(void *arg){
 
     pthread_mutex_lock(&candado);
     float input = *((float *) arg);
-    sumaParcial = 1/(input*(input+1));
+    //float abajo = input * ( input + 1);
+    sumaParcial = 1/(input*(input + 1));
+    //sumaParcial = 1/abajo;
     pthread_mutex_unlock(&candado);
-    cout << "Suma parcial: " << sumaParcial << endl;
-    return NULL;
 
 }
 
@@ -43,12 +43,14 @@ int main(){
         pthread_create(&idThread[i], &attr, sumatoria, (void *) &n);
     }
 
-    for (int k = 1; k < num_max; k++) {
-        pthread_join(idThread[k], NULL);
+    for (int i = 1; i < num_max; i++) {
+        pthread_join(idThread[i], NULL);
         resultado += sumaParcial;
-        sumaParcial = 0;
+        //cout << "El resultado de la sumatoria es: " << resultado << endl;
+
     }
 
+    cout << "" << endl;
     cout << "El resultado de la sumatoria es: " << resultado << endl;
 
     //liberar memoria
