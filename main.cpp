@@ -1,11 +1,6 @@
-/***
-* Extraído de lab 3 de Programación de Microprocesadores
-* https://github.com/jazurdia/Lab_03_MP
- *
- * Laboratorio 4 parte 1 B
- * Implementación de Mutex.
-*/
-
+//
+// Created by Alejandro Azurdia on 4/09/22.
+//
 
 #include <iostream>
 #include <pthread.h>
@@ -14,50 +9,54 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <mutex>
 using namespace std;
 
-// funcion para p_threads que evalua n en la sumatoria.
+float resultado;
+float sumaParcial;
+pthread_mutex_t candado;
+
 void *sumatoria(void *arg){
-    float *n;
-    n = (float *)arg;
-    float *resultado;
-    resultado = (float *)malloc(sizeof(float));
-    *resultado = 1/((*n)*((*n)+1));
-    return (void *)resultado;
+
+    pthread_mutex_lock(&candado);
+    float input = *((float *) arg);
+    sumaParcial = 1/(input*(input+1));
+    pthread_mutex_unlock(&candado);
+    cout << "Suma parcial: " << sumaParcial << endl;
+    return NULL;
+
 }
 
 int main(){
-    float n;
+    int num_max;
     cout << "Ingrese el numero n: " << endl;
-    cin >> n;
-    float resSumatoria = 0;
+    cin >> num_max;
 
-    for (int i = 1; i < n; i++) {
-        pthread_t hilo;
-        pthread_attr_t attr;
+    // instanciar los hilos.
+    pthread_t idThread[num_max]; // para n hilos con idThread[i] para el i-esimo hilo.
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-        float v = (float) i;
-
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-        void *exit_value;
-        pthread_create(&hilo, &attr, sumatoria, (void *) &v);
-        pthread_join(hilo, &exit_value);
-        float res = *((float *) exit_value);
-        free(exit_value);
-
-        resSumatoria += res;
+    for (int i = 1; i < num_max; i++) {
+        float n = (float) i;
+        pthread_create(&idThread[i], &attr, sumatoria, (void *) &n);
     }
 
+    for (int k = 1; k < num_max; k++) {
+        pthread_join(idThread[k], NULL);
+        resultado += sumaParcial;
+        sumaParcial = 0;
+    }
 
+    cout << "El resultado de la sumatoria es: " << resultado << endl;
 
-
-
-
-
-    cout << "El valor de la sumatoria es: " << resSumatoria << endl;
-
+    //liberar memoria
+    pthread_attr_destroy(&attr);
+    pthread_mutex_destroy(&candado);
+    pthread_exit(NULL);
     return 0;
 
 }
+
+
