@@ -3,4 +3,4 @@ project(Lab4Parte1_2)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Lab4Parte1_2 main.cpp)
+add_executable(Lab4Parte1_2 "Parte B/main.cpp")

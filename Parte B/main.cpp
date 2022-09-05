@@ -60,6 +60,7 @@ int main(){
     return 0;
 
     // no se que pasó pero mejor pongo este comentario para que sea la última versión del archivo.
+    // x2
 
 }
 
